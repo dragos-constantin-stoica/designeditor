@@ -1,0 +1,659 @@
+<!doctype html>
+<html>
+<head>
+    <title>CouchDB Design doc editor</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link rel="stylesheet" href="vendor/couchapp/layout-default-latest.css">    
+    <link rel="stylesheet" href="vendor/couchapp/codemirror.css">
+    <script src="/_utils/script/jquery.js?1.6.2"></script>
+	<script src="/_utils/script/json2.js"></script>
+    <script src="/_utils/script/sha1.js"></script>
+    <script src="/_utils/script/jquery.couch.js?0.11.0"></script>
+    <script src="/_utils/script/jquery.dialog.js?0.11.0"></script>    
+    <script src="vendor/couchapp/jquery-ui.min.js"></script>
+    <script src="vendor/couchapp/jquery.layout-latest.min.js"></script>
+    <script src="vendor/couchapp/codemirror.js"></script>
+    <script src="vendor/couchapp/foldcode.js"></script>
+    <script src="vendor/couchapp/formatting.js"></script> 
+    <script src="vendor/couchapp/active-line.js"></script>
+    <script src="vendor/couchapp/multiplex.js"></script>
+    <script src="vendor/couchapp/brace-fold.js"></script>
+    <script src="vendor/couchapp/indent-fold.js"></script>
+    <script src="vendor/couchapp/matchbrackets.js"></script>
+    <script src="vendor/couchapp/searchcursor.js"></script>
+    <script src="vendor/couchapp/match-highlighter.js"></script>        
+    <script src="vendor/couchapp/loadmode.js"></script>
+
+    <style type="text/css">
+      .CodeMirror-activeline-background {background: #f0f0f0 !important;}
+      .CodeMirror-focused .cm-matchhighlight { background: #FFE680 !important;}
+      .CodeMirror-gutter {min-width: 2.6em; cursor: pointer;}
+      .CodeMirror-fullscreen {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 99%;
+        height: 99%;
+        z-index: 9999;
+      }
+      .CodeMirror-foldmarker {
+			color: blue;
+			text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
+			font-family: arial;
+			line-height: .3;
+			cursor: pointer;
+		} 
+		.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+		
+    </style>
+</head>
+  
+<!--
+
+Detalii despre jquery.couch.js la adresa:
+
+http://bradley-holt.com/2011/07/couchdb-jquery-plugin-reference/
+
+-->  
+  
+  
+<script>
+//Connect only to localhost server
+$.couch.urlPrefix = "http://localhost:5984";
+
+//Main layout
+var myLayout;
+
+//Code editor
+var editor;
+//Auxiliary variables used for _design doc information
+var cacheDD = {};
+var functiaCurenta = {};
+
+function saveSursa() {
+    var s = editor.getValue();
+    $.couch.db($("#database").val()).openDoc(functiaCurenta.numeDoc, {
+        success: function(doc) {
+            // Acum punem sursa s la locul ei
+            if (functiaCurenta.numeGrup===null) {
+                // asta se întâmplă doar la funcție de validate_doc_update
+                doc[functiaCurenta.tip] = s;
+            } else {
+                if (functiaCurenta.numeFunctie==null) {
+					//show, list, filter, update
+                    doc[functiaCurenta.tip][functiaCurenta.numeGrup] = s;
+                } else {
+					//view
+                    doc[functiaCurenta.tip][functiaCurenta.numeGrup][functiaCurenta.numeFunctie] = s;
+                }
+            }
+            saveDesignDocument(doc);
+        },
+        error: function(status) {
+            //console.log(status);
+            logAppend("<strong style='color: red;'>Error saving source:</strong>&nbsp;"+JSON.stringify(status));
+        }
+    });
+}
+
+function saveDesignDocument(doc) {
+    $.couch.db($("#database").val()).saveDoc(doc, {
+        success: function(data) {
+            //console.log(data);
+            logAppend("<strong>Document successfully saved!</strong>");
+            cacheDD[doc['_id']] = doc;
+        },
+        error: function(status) {
+            //console.log(status);
+            logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));        
+        }
+    });
+}
+
+function showSursaFunctie(numeDoc,tip,numeGrup,numeFunctie) {
+	$("#btnSave").removeAttr("disabled");
+	setStateCodeSnipletsButtons(false);
+    // tip poate fi 'views' , 'lists' , 'updates'
+    // shows, fulltext, filters
+    functiaCurenta.numeDoc = numeDoc;
+    functiaCurenta.tip = tip;
+    functiaCurenta.numeGrup = numeGrup;
+    functiaCurenta.numeFunctie = numeFunctie;
+    var temp;
+    // numeGrup este null doar pentru validate_doc_update
+    if (numeGrup===null) {
+        temp = cacheDD[numeDoc][tip];
+    } else {
+        temp = cacheDD[numeDoc][tip][numeGrup];
+    }
+    if (numeFunctie!==null && typeof numeFunctie!=="undefined") {
+        temp = temp[numeFunctie];
+    }
+    editor.setValue(temp);
+    var infoPath = "/"+$("#database").val()+"/"+numeDoc+" "+tip;
+    if (numeGrup!==null) {
+        infoPath +="[\""+numeGrup+"\"]";
+        if (numeFunctie!==null) infoPath +=  "[\""+numeFunctie+"\"]";
+    }
+    $('#url_design_doc').html(infoPath);
+}
+
+//Extract each field from the design doc and display it in lista_functii
+function showCuprinsDesignDoc(doc) {
+    var numeDoc = functiaCurenta.numeDoc;
+    cacheDD[numeDoc] = doc;
+    editor.setOption("mode", (typeof(doc.language)!=="undefined"?doc.language:"javascript"));
+    CodeMirror.autoLoadMode(editor, (typeof(doc.language)!=="undefined"?doc.language:"javascript")); 
+    var lf = "";
+    if (doc.views) {
+        // are views
+        lf += "<b>Views</b>";
+        $.each(doc.views, function(numeView, objView) {
+            lf += "<br>"+numeView+" :";
+            //aici sunt maps
+            if (objView.map) {
+                lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','views','"+numeView+"','map')\">map</a></i>";
+            }
+            //aici sunt reduce
+            if (objView.reduce) {
+                lf += "&nbsp;&hArr;&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','views','"+numeView+"','reduce')\">reduce</a></i>";
+            }
+        });
+    }
+    if (doc.lists) {
+        // are lists
+        lf += "<br><b>Lists</b>";
+        $.each(doc.lists, function(numeList, sursaList) {
+            lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','lists','"+numeList+"',null)\">"+numeList+"</a></i>";
+        });
+    }
+    if (doc.shows) {
+        // are shows
+        lf += "<br><b>Shows</b>";
+        $.each(doc.shows, function(numeShow, sursaShow) {
+            lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','shows','"+numeShow+"',null)\">"+numeShow+"</a></i>";
+        });
+    }
+    if (doc.updates) {
+        // are updates
+        lf += "<br><b>Updates</b>";
+        $.each(doc.updates, function(numeUpdate, sursaUpdate) {
+            lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','updates','"+numeUpdate+"',null)\">"+numeUpdate+"</a></i>";
+        });
+    }
+    if (doc.filters) {
+        // are filters
+        lf += "<br><b>Filters</b>";
+        $.each(doc.filters, function(numeFilter, sursaFilter) {
+            lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','filters','"+numeFilter+"',null)\">"+numeFilter+"</a></i>";
+        });
+    }
+    if (doc.fulltext) {
+        // are fulltext - lucene
+        lf += "<br><b>Fulltext</b>";
+        $.each(doc.fulltext, function(numeView, sursaIndex) {
+            lf += "<br>"+numeView;
+            if (sursaIndex.index) {
+                lf += "<br>&nbsp;<i><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','fulltext','"+numeView+"','index')\">index</a></i>";
+            }
+        });
+    }
+    if (doc.validate_doc_update) {
+        // are validate_doc_update
+        lf += "<br><b><a href='#' onClick=\"showSursaFunctie('"+numeDoc+"','validate_doc_update',null,null)\">Validate</a></b>";
+    }
+    $('#lista_functii').html(lf);
+}
+
+//Load design doc selected in design list
+function loadDesignDoc(functieSucces) {
+    if (functieSucces==null) functieSucces=showCuprinsDesignDoc;
+    //$('#url_design_doc').html("");
+    editor.setValue("");
+    $("#btnSave").attr("disabled", "disabled");
+    functiaCurenta.numeDoc = $('#design').val();
+    $.couch.db($("#database").val()).openDoc(functiaCurenta.numeDoc, {
+        success: function(data) {
+            //console.log(data);
+            functieSucces(data);
+        },
+        error: function(status) {
+            //console.log(status);
+            logAppend("<strong style='color: red;'>Error on loading design doc:</strong>&nbsp"+JSON.stringify(status));
+        }
+    });
+}
+
+//Helper function to log information on logDiv
+//data - html to be appended to logDiv
+function logAppend(data){
+	$('#logDiv').html($('#logDiv').html() + data + "<br>");
+	$('.ui-layout-south').animate({scrollTop: $('.ui-layout-south').prop("scrollHeight")}, 500);
+}
+
+//Enable/disable code sniplets buttons
+function setStateCodeSnipletsButtons(enable){
+ if(enable){
+	$("#btnRunJS").removeAttr("disabled");
+	$("#btnSaveJS").removeAttr("disabled");
+	$("#btnNewJS").removeAttr("disabled");
+	$("#btnDelJS").removeAttr("disabled");
+ }else{
+	$("#btnRunJS").attr("disabled", "disabled");
+	$("#btnSaveJS").attr("disabled", "disabled");
+	$("#btnNewJS").attr("disabled", "disabled");
+	$("#btnDelJS").attr("disabled", "disabled");
+ }
+}
+
+//Initialize fields after changes
+function cleanUp(){
+	$('#design')
+				.empty()
+				.append('<option value="">---Select a _design---</option>')
+		;   
+		$('#url_design_doc').html(""); 
+		$('#lista_functii').html("");
+		$("#btnSave").attr("disabled", "disabled");
+		editor.setValue("");
+};
+
+//Initialize code sniplets
+function initCodeSniplets(){
+	//get code sniplets
+    //they are stored as string in fields of document sample_scripts
+    $.couch.db("designeditor").openDoc("sample_scripts", {
+		success: function(data) {
+			//console.log(data);
+			logAppend("<strong>All code sniplets loaded.</strong>&nbsp;");
+			$('#code_sniplets')
+				.empty()
+				.append('<option value="">---Select a code sniplet---</option>')
+			;
+			$.each(data, function(key, value){
+				if(key != "_id" && key != "_rev" && key !="couchapp"){
+					$('#code_sniplets')
+						.append($("<option></option>")
+						.attr("value",key)
+						.text(key));
+				}
+			});
+			editor.setValue("");
+		},
+		error: function(status) {
+			//console.log(status);
+            logAppend("<strong style='color: red;'>Error on loading code sniplet:</strong>&nbsp"+JSON.stringify(status));
+		}
+	});
+}
+
+
+//Retrieve the _design docs form selected database
+//TODO - connect with the user and password
+//for now it works only with admin
+function connectToDatabase(){
+	if($("#database").val()!==""){
+	$('#url_design_doc').html("/"+$("#database").val());
+	$('#lista_functii').html("");
+	$('#code_sniplets').val("");
+	$.couch.db($("#database").val()).allDesignDocs({
+		success: function(data) {
+			logAppend("<strong>Design docs found:</strong>&nbsp;"+JSON.stringify(data));
+			$("#btnRunJS").attr("disabled", "disabled");
+			setStateCodeSnipletsButtons(false);
+
+			$('#design')
+				.empty()
+				.append('<option value="">---Select a _design---</option>')
+			;
+			$.each(data["rows"], function(key,value) {   
+				 $('#design')
+					 .append($("<option></option>")
+					 .attr("value",value["id"])
+					 .text(value["id"])); 
+			});			
+			//console.log(data);
+		}
+	});
+	}
+}
+
+//Execute javascript inside the code
+function runJS(){
+	if (editor.getValue() !== ""){
+		eval(editor.getValue());
+	}
+} 
+
+//Save code sniplet
+function saveJS(){
+	//Get sample_scripts doc
+	$.couch.db("designeditor").openDoc("sample_scripts", {
+	  success: function(data) {
+		data[$('#code_sniplets').val()]=editor.getValue();
+		
+		//save changes
+		$.couch.db("designeditor").saveDoc(data, {
+		  success: function(data) {
+			logAppend("<strong>Sniplet:&nbsp;" + $('#code_sniplets').val() + " saved!</strong>");
+			//console.log(data); 
+		  }, 
+		  error: function(status) {        
+			logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));      
+			//console.log(status); 
+		  }      
+		});
+		//console.log(data);
+	  },
+	  error: function(status) {
+		logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));
+		console.log(status);
+	  }
+	});
+}
+
+//Save new code sniplet
+function newJS(){
+	var code_name = prompt("NEW Sniplet name:");
+	if (code_name!=null && code_name!=""){
+		//save the new code sniplet
+			//Get sample_scripts doc
+			$.couch.db("designeditor").openDoc("sample_scripts", {
+			  success: function(data) {
+				data[code_name]="//Your jquery.couchdb code here\n";
+				
+				//save changes
+				$.couch.db("designeditor").saveDoc(data, {
+				  success: function(data) {
+					logAppend("<strong>Sniplet:&nbsp;" + code_name + " created!</strong>");
+					initCodeSniplets();
+					//console.log(data); 
+				  }, 
+				  error: function(status) {        
+					logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));      
+					//console.log(status); 
+				  }      
+				});
+				//console.log(data);
+			  },
+			  error: function(status) {
+				logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));
+				console.log(status);
+			  }
+			});
+	}
+}
+
+//Delete currently selected code sniplet
+function delJS(){
+	var doDELETE = confirm("YOU ARE SURE THAT YOU WANT TO DELETE " + $('#code_sniplets').val() + " CODE SNIPLET?");
+	if(doDELETE==true){
+		//delete this code sniplet
+		//Get sample_scripts doc
+		$.couch.db("designeditor").openDoc("sample_scripts", {
+		  success: function(data) {
+			delete data[$('#code_sniplets').val()];
+			
+			//save changes
+			$.couch.db("designeditor").saveDoc(data, {
+			  success: function(data) {
+				logAppend("<strong>Sniplet:&nbsp;" + $('#code_sniplets').val() + " deleted!</strong>");
+				initCodeSniplets();
+				//console.log(data); 
+			  }, 
+			  error: function(status) {        
+				logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));      
+				//console.log(status); 
+			  }      
+			});
+			//console.log(data);
+		  },
+		  error: function(status) {
+			logAppend("<strong style='color: red;'>Error:</strong>&nbsp;"+JSON.stringify(status));
+			console.log(status);
+		  }
+		});
+	}
+}
+
+//Inititalize all after document ready
+$(document).ready(function() {   
+	 //Try to connec to server 
+     $.couch.info({
+		success: function(data) {
+			logAppend("<strong>Response from server:</strong>&nbsp;"+JSON.stringify(data));
+			//console.log(data);
+		}
+	});
+	//Get the list of available databases
+	$.couch.allDbs({
+		success: function(data) {
+			logAppend("<strong>List of all databases:</strong>&nbsp;"+JSON.stringify(data));
+			$('#database')
+				.empty()
+				.append('<option value="">---Select a database---</option>')
+			;
+			$.each(data, function(key,value) {   
+				 $('#database')
+					 .append($("<option></option>")
+					 .attr("value",value)
+					 .text(value)); 
+			});
+			//console.log(data);
+		}
+	});
+    
+    initCodeSniplets();
+         
+	// Configure this layout
+	myLayout = $('body').layout({
+
+	//	reference only - these options are NOT required because 'true' is the default
+		closable:					true	// pane can open & close
+	,	resizable:					true	// when open, pane can be resized 
+	,	slidable:					true	// when closed, pane can 'slide' open over other panes - closes on mouse-out
+	,	livePaneResizing:			true
+
+	//	some resizing/toggling settings
+	,	north__slidable:			false	// OVERRIDE the pane-default of 'slidable=true'
+	,	north__togglerLength_closed: '100%'	// toggle-button is full-width of resizer-bar
+	,	north__spacing_closed:		10		// big resizer-bar when open (zero height)
+	,	south__resizable:			true	// OVERRIDE the pane-default of 'resizable=true'
+	,	south__spacing_open:		5		// no resizer-bar when open (zero height)
+	,	south__spacing_closed:		10		// big resizer-bar when open (zero height)
+
+	//	some pane-size settings
+	,	north__size:				"auto"
+	,	west__minSize:				100
+	,	east__size:					500
+	,	east__minSize:				300
+	,	east__maxSize:				.5 // 50% of layout width
+	,	center__minWidth:			100
+
+	//	enable showOverflow on west-pane so CSS popups will overlap north pane
+	,	west__showOverflowOnHover:	false
+	,	east__initClosed:	        true
+	//	enable state management
+	,	stateManagement__enabled:	false  // automatic cookie load & save enabled by default
+
+	,	showDebugMessages:			false // log and/or display messages from debugging & testing code
+	});
+
+	//if there is no state-cookie, then DISABLE state management initially 
+	//var cookieExists = !$.isEmptyObject( myLayout.readCookie() );
+	//if (!cookieExists) toggleStateManagement( true, false );
+
+	$("#btnSave").attr("disabled", "disabled");
+	setStateCodeSnipletsButtons(false);
+	//Database onChange - clean design list
+	$('#database').change(function() {
+		cleanUp();
+	});
+
+	//Design onChange - load view, list, show, update, filter etc in 
+	$('#design').change(function() {
+		if($("#design").val()!==""){
+			$('#url_design_doc').html("/"+$("#database").val()+"/"+$('#design').val());
+			loadDesignDoc();
+		}else{
+			$('#url_design_doc').html(""); 
+			$('#lista_functii').html("");
+			$("#btnSave").attr("disabled", "disabled");
+			editor.setValue("");
+		}
+	});
+	
+	//Code sniplets onChange - load corresponding code in code area
+	$('#code_sniplets').change(function(){
+		if($('#code_sniplets').val()!==""){
+			$.couch.db("designeditor").openDoc("sample_scripts", {
+				success: function(data) {
+					//console.log(data.all_views);
+					cleanUp();
+					setStateCodeSnipletsButtons(true);
+					editor.setOption("mode", "javascript");
+					CodeMirror.autoLoadMode(editor, "javascript"); 
+					editor.setValue(data[$('#code_sniplets').val()]);
+				},
+				error: function(status) {
+		            logAppend("<strong style='color: red;'>Error on loading code sniplet:</strong>&nbsp"+JSON.stringify(status));
+					//console.log(status);
+				}
+			});
+		}else{
+			setStateCodeSnipletsButtons(false);
+			editor.setValue("");
+		}
+	});
+});
+</script>
+  
+<body class="ui-layout-container" style="overflow: hidden; width: auto; height: auto; margin: 0px; position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;">
+
+<div class="ui-layout-north" >
+	Connect to database --- 
+	<!--
+	<label for="user">user</label>  <input type="text" name="user" id ="user" size=10> :
+	<label for="password">password</label> <input type="password" name="password" id="password" size=10> @
+	-->
+	<label for="database">database</label>
+	<select id="database" name="database">
+		<option value="">---Select a database---</option>
+	</select> 
+	<button onClick="connectToDatabase()">Connect to database</button>
+</div>
+
+<!-- allowOverflow auto-attached by option: west__showOverflowOnHover = true -->
+<div class="ui-layout-west">
+	<!--<label for="design">_design:</label>-->
+	<select id="design" name="design">
+		<option value="">---Select a _design---</option>
+	</select>
+	<div id='lista_functii' style='width:auto;height:auto;overflow:auto;font-size:0.8em'>
+    </div>
+</div>
+
+<div class="ui-layout-south">
+	<div id='logDiv' style="overflow:auto;"><b>Console:</b>&nbsp;Here you will see the output from scripts ...<br></div>
+</div>
+
+<div class="ui-layout-east">
+	<label for="code_sniplets">Code sniplets:</label>
+	<select id="code_sniplets" name="code_sniplets">
+		<option value="">---Select a code sniplet---</option>
+	</select>
+
+<br> These are templates, please select one change it and then click RUN<br>or fill in the code area and then click RUN<br>
+<hr>
+<button id="btnRunJS" name="btnRunJS" onClick="runJS()"><b>RUN</b></button>
+<hr>
+<button id="btnSaveJS" name="btnSaveJS" onClick="saveJS()"><b>SAVE</b></button>
+<hr>
+<button id="btnNewJS" name="btnNewJS" onClick="newJS()"><b>NEW</b></button>
+<hr>
+<button id="btnDelJS" name="btnDelJS" onClick="delJS()"><b>!!!DELETE!!!</b></button>
+<hr>
+</div>
+
+<div class="ui-layout-center">
+	<span id='url_design_doc' style='color:blue;'>&nbsp;</span>&nbsp;&nbsp;&rArr;&nbsp;&nbsp;
+	<button id="btnSave" name="btnSave" onClick="saveSursa()">Save Changes</button><br>
+            <div>
+                <textarea id="code" name="code"></textarea>
+                <br/>
+                Key mapping:<br/>
+                <b>F11</b> - togle full screen mode | <b>Esc</b> - Exit full screen mode <br/>
+                <b>Ctrl-Q</b> - Fold/unfold code | <b>Ctrl-Shift-F</b> - Format selection <br/>
+                <b>Ctrl-Shift-C</b> - Coment selection | <b>Ctrl-Shift-U</b> - Uncomment selection<br/>
+                Highligh selection is enabled by default.
+            </div>	
+</div>
+
+<script>
+	CodeMirror.modeURL = "vendor/couchapp/%N.js";   
+	 
+	function isFullScreen(cm) {
+	  return /\bCodeMirror-fullscreen\b/.test(cm.getWrapperElement().className);
+	};
+	function winHeight() {
+	  return window.innerHeight || (document.documentElement || document.body).clientHeight;
+	};
+	function setFullScreen(cm, full) {
+	  var wrap = cm.getWrapperElement(), scroll = cm.getScrollerElement();
+	  if (full) {
+		myLayout.close("north");
+		myLayout.close("south");
+		myLayout.close("east");
+		myLayout.close("west");
+		wrap.className += " CodeMirror-fullscreen";
+		scroll.style.height = "99%";
+		document.documentElement.style.overflow = "hidden";
+	  } else {
+		myLayout.open("north");
+		myLayout.open("south");
+		myLayout.open("west");  
+		wrap.className = wrap.className.replace(" CodeMirror-fullscreen", "");
+		scroll.style.height = "";
+		document.documentElement.style.overflow = "";
+	  }
+	  cm.refresh();
+	};
+	CodeMirror.on(window, "resize", function() {
+	  var showing = document.body.getElementsByClassName("CodeMirror-fullscreen")[0];
+	  if (!showing) return;
+	  showing.CodeMirror.getScrollerElement().style.height = winHeight() + "px";
+	});
+	function getSelectedRange(cm) {
+		return { from: cm.getCursor(true), to: cm.getCursor(false) };
+	};      
+	function autoFormatSelection(cm) {
+		var range = getSelectedRange(cm);
+		cm.autoFormatRange(range.from, range.to);
+	};     
+	function commentSelection(cm,isComment) {
+		var range = getSelectedRange(cm);
+		cm.commentRange(isComment, range.from, range.to);
+	};   
+	function foldFunc(cm, where) { 
+		cm.foldCode(where, CodeMirror.braceRangeFinder); 
+	}
+         
+	editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+		styleActiveLine: true,
+		highlightSelectionMatches: true,
+		lineWrapping: true,
+		lineNumbers: true,
+		matchBrackets: true,
+		extraKeys: {
+			"Ctrl-Q": function(cm){foldFunc(cm, cm.getCursor());},
+			"F11": function(cm) {setFullScreen(cm, !isFullScreen(cm));},
+			"Esc": function(cm) {if (isFullScreen(cm)) setFullScreen(cm, false);},
+			"Shift-Ctrl-F": function(cm){autoFormatSelection(cm);},
+			"Shift-Ctrl-C": function(cm){commentSelection(cm,true);},
+			"Shift-Ctrl-U": function(cm){commentSelection(cm,false);}
+		}
+	});
+	editor.on("gutterClick", foldFunc);
+	
+</script> 
+</body>
+</html>

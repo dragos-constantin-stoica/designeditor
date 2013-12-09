@@ -1,13 +1,17 @@
 designeditor
 ============
 
-Couchdb _design documents editor
+Couchdb _design documents editor.
+
+Note this code uses parts or full code from: 
+- codemirror
+- jquery
 
 Introduction
 ============
 
 This application was build to leverage the basic code editor that is built in CouchDB.
-We start using CouchDB in 2012 and we faced an infation of _design docs with associated views, list etc 
+We started using CouchDB in 2012 and we faced an inflation of _design docs with associated views, list etc 
 and the actual tool was no more answering to our needs
 so we build a tool that is simple, included in CouchDB and allows to manage _design docs globally.
 

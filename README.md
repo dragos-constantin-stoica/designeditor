@@ -3,7 +3,7 @@ designeditor
 
 Couchdb _design documents editor.
 
-Note this code uses parts or full code from: 
+Note this editor uses parts or full code from: 
 - codemirror
 - jquery
 

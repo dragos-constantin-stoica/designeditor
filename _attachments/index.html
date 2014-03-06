@@ -1845,12 +1845,13 @@
 	<!-- Database grid contextual menu -->
 	<div id="cmDatabaseGrid" class="easyui-menu" style="width:180px;">
 		<div onclick="designDocuments()" data-options="iconCls:'icon-search'">Design Documents</div>
-		<div onclick="compactDatabase()" data-options="iconCls:'icon-ok'">Compact Database</div>
-		<div onclick="cleanupViews()" data-options="iconCls:'icon-filter'">Cleanup Views</div>
-		<div onclick="rebuildAllIndex()" data-options="iconCls:'icon-reload'">Rebuild all index</div>
 		<div class="menu-sep"></div>
 		<div onclick="openDocument()" data-options="iconCls:'icon-edit'">Open document</div>
 		<div onclick="createDocument()" data-options="iconCls:'icon-save'">New document</div>
+		<div class="menu-sep"></div>
+		<div onclick="cleanupViews()" data-options="iconCls:'icon-filter'">Cleanup Views</div>
+		<div onclick="rebuildAllIndex()" data-options="iconCls:'icon-reload'">Rebuild all index</div>
+		<div onclick="compactDatabase()" data-options="iconCls:'icon-ok'">Compact Database</div>		
 		<div class="menu-sep"></div>		
 		<div onclick="deleteDatabase()" data-options="iconCls:'icon-no'">Delete Database</div>
 	</div>
@@ -1879,7 +1880,7 @@
 			<li>jQuery</li>
 			<li>jQuery CouchDB</li>
 			<li>jQuery EasyUI</li>
-			<li> Ace Editor</li>
+			<li>Ace Editor</li>
 			<li>jsbeautifier</li>
 		</ul>
 		</div>

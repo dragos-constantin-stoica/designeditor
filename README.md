@@ -6,7 +6,7 @@ Couchdb _design documents editor, and some other nice features.
 Note this editor uses parts or full code from: 
 
 - jquery.couch.js
-- couchdb.js
+- couch.js
 - Futon CouchDB
 - jquery EasyUI
 - Ace Editor

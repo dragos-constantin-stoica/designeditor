@@ -58,8 +58,7 @@ You have a contextual menu for each database row. You have a global database men
 - Replicator: does the replication. You can replicate only some documentes or/and use filters with parameters
 - Refresh: reload all local databases intro the database grid
 
-The context menu for database
---------------------------
+### The context menu for database
 
 - Design Documents: loads all design documents (_design/) into the Design Documents tab
 - Compact Database: compacts the database. **CAUTION!** All versions of the documents will be deleted but last -- the only to be kept
@@ -74,8 +73,8 @@ javascript and can be directly edited
 document.
 - Delete Database: deletes selected database. **CAUTION!** This operation is irreversible!
 
-The content of Design Documents Editor
-----------------------------------
+### The content of Design Documents Editor
+
 
 On the left side you have a collapsible panel with a tree grid contanting the list of all design documents from selected
 database. The following document types are recognized: **views** (map and reduce functions), **lists**, **shows**, **updates**, 

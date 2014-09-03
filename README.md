@@ -20,7 +20,7 @@ Or install manually:
 * create new design document _design/appzip
 * attach all files from archive (except *.zip)
 
-Access url: [http://localhost:5984/appzip/_design/appzip/index.html] and you should see the web interface.
+Access url: [http://localhost:5984/appzip/_design/appzip/index.html](http://localhost:5984/appzip/_design/appzip/index.html) and you should see the web interface.
 
 Usage
 =====
@@ -61,32 +61,56 @@ There are a couple of rules that must be respected:
 	  .
 	  .
 	  .
+	  manifest.json
 	</pre>
 
 
 	Design document folder and file structure structure
 	
 	<pre>
-	attachements
-	views
-	 |_ map
-	 |_ reduce
-	lists
-	shows
-	updates
-	filters
-	rewrites
-	validate_doc_update
-	fulltext
+	[database_name]
+	  |
+	  |_ [document_name]
+	  |    |
+	  |    |_[design_document_structure]
+	           |
+	           |
+		   |_ _attachements
+		   |
+		   |_ views
+		   |    |_[view_name]
+		   |    |   |_ map.js
+		   |	|   |_ reduce
+		   |    ...
+		   |
+		   |_ lists
+		   |
+		   |_ shows
+		   |
+		   |_ updates
+		   |
+		   |_ filters
+		   |
+		   |_  rewrites
+		   |
+		   |_ validate_doc_update
+		   |
+		   |_ fulltext	        
+		   |
+	           |_ doc_attributes.js
+	  .
+	  .
+	  .
+
 	</pre>
 	
 	doc_attributes.json file structure
 
-	A JSON containing all atributes of the document. If no _id is provided then a new "data" document is create. In order to create a design_doc use "_id": "_design/[design_document_name]. Defult language is javascript if not provided.
+	A JSON containing all atributes of the document. If no _id is provided then a new "data" document is created using a CouchDB generated id. In order to create a design_doc use "_id": "_design/[design_document_name]. Defult language is javascript if not provided.
 	
 	<pre>
 	{
-	 "_id":"[design_document_name]",
+	 "_id":"[design_document_name | document_id]",
 	 "language":"javascript",
 	 ["attribute"]:[value]
 	}

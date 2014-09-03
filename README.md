@@ -73,8 +73,8 @@ There are a couple of rules that must be respected:
 	  |_ [document_name]
 	  |    |
 	  |    |_[design_document_structure]
-	           |
-	           |
+	  .    |
+	  .    |
 		   |_ _attachements
 		   |
 		   |_ views
@@ -97,7 +97,7 @@ There are a couple of rules that must be respected:
 		   |
 		   |_ fulltext	        
 		   |
-	           |_ doc_attributes.js
+	       |_ doc_attributes.js
 	  .
 	  .
 	  .
@@ -107,6 +107,8 @@ There are a couple of rules that must be respected:
 	doc_attributes.json file structure
 
 	A JSON containing all atributes of the document. If no _id is provided then a new "data" document is created using a CouchDB generated id. In order to create a design_doc use "_id": "_design/[design_document_name]. Defult language is javascript if not provided.
+	
+	
 	
 	<pre>
 	{

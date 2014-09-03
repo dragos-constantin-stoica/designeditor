@@ -26,9 +26,9 @@ Enjoy using it, as we do!
 How to install?
 ===============
 
-0. Install Appzip https://github.com/dragos-constantin-stoica/designeditor/tree/appzip
+0. Install CouchApp (http://couchapp.org/page/index), needed to push this application to local CouchDB server. You can upload files individually but I do not recommend it.
 1. Clone this repository (git clone git://github.com/dragos-constantin-stoica/designeditor.git)
-2. Publish design.zip with Appzip
+2. Open a terminal, go to the directory  (cd /designeditor) and issue commnad: couchapp push
 3. Open you favorite web browser and go to: http://localhost:5984/designeditor/_design/editor/index.html
 4. Enjoy!
 

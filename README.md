@@ -11,6 +11,8 @@ Note this editor uses parts or full code from:
 - jquery EasyUI
 - Ace Editor
 - jsbeautifier 
+- JSZip
+- underscore.js
 
 Introduction
 ============
@@ -49,6 +51,7 @@ reload the server log,
 - Server Status: opens in new tab the list of active tasks on the CouchDB server,
 - Snippets: opens in new tab snippets that can be run from the browser. **CAUTION!** The execution is synchronous and
 may block the browser if the script takes too long to complete, and
+- AppZip integration: you can publish couchapps in zip format with this tool
 - About.
 
 Aftre susccessfully loading the applcation, you will see the list of databases loaded intro the database grid.

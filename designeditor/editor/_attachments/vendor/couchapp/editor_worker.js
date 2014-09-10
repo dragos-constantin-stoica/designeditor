@@ -21,6 +21,16 @@ self.onmessage = function(e) {
       self.postMessage('<em>WORKER :</em> Yes Master!');
 	  //self.postMessage(JSON.parse(CouchDB.request("GET", "/").responseText));
       break;
+    case 'saveDocumentation':
+		self.postMessage('<em>WORKER</em> got: ' + data.msg.database + "-" + data.msg.ddoc);
+		var xhr = CouchDB.request("PUT", "/" + data.msg.database + "/DOCUMENTATION/index.html" +
+		((data.msg.rev != "")? "?rev=" + data.msg.rev:""), {
+			headers:{"Content-Type":"text/html;charset=utf-8"},
+			body:data.msg.ddoc
+		  });
+		self.postMessage('<em>WORKER</em> saveDocumentation for ' + data.msg.database + ((xhr.status != 201)?' <b>failed!</b>':' OK!'));
+
+		break;
     case 'rebuildIndex':
 		self.postMessage('<em>WORKER</em> got: ' + data.msg.database + "-" + data.msg.ddoc);
 		//rebuil index for all views from the design document

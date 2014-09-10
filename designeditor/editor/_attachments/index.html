@@ -23,7 +23,7 @@
 	</style>
 
 	<script type="text/javascript" src="vendor/couchapp/jquery.min.js"></script>
-
+	<script src="async.js" type="text/javascript"></script>	
 
 	<script type="text/javascript" src="vendor/couchapp/dist/jszip.js"></script>
 	<script type="text/javascript" src="vendor/couchapp/dist/jszip-utils.js"></script>
@@ -40,8 +40,8 @@
 
 	<script type="text/javascript" src="vendor/couchapp/ace-src-min-noconflict/require.js"  charset="utf-8"></script>       
 	<script type="text/javascript" src="vendor/couchapp/ace-src-min-noconflict/ace.js"  charset="utf-8"></script>       
-    <!--       
     <script src="vendor/couchapp/jquery-migrate-1.0.0.js"></script>
+     <!--       
     <script src="/_utils/script/jquery.js?1.6.2"></script>
 	-->
 	<script src="/_utils/script/json2.js"></script>
@@ -682,10 +682,10 @@
 		if (res != null) {
 			myArray.push(" ");
 			$.each(res, function(k, comment) {
+				//myArray.push(encodeURIComponent( escape( comment))+ "<br/>");
 				myArray.push(comment+ "<br/>");
 			})
 			for ( var i = 0; i < myArray.length; i = i + 1 ){
-				$("#comment").append(myArray[i]);
 				console.log(myArray[i]);
 			}
 		}
@@ -695,191 +695,183 @@
 	function generateDocumentation () {
 		if(row){
 			//row.db_name --- database name
-			var docStr ="Database: " + row.db_name;
-
-		$.couch.db(row.db_name).allDesignDocs({
-			success: function(data) {
-				logAppend("<strong>Design docs found:</strong>&nbsp;"+JSON.stringify(data).replace(/,/g,', '));
-
-				$.each(data["rows"], function(key,value) {   
-										
-					$.couch.db(row.db_name).openDoc(value["id"], {
-						success: function(data) {
-							
-							//data.language --- script language, default javascript
-							//value["id"] --- ddoc name
-							docStr += "<li>";
-			                docStr += "<h3>Design Doc : "+ value["id"] + "<h3/>" ;
-			                docStr+= "<h4>"+ "Language: "+ data.language +"</h4>";
-							
-							//console.log(data);
-							if (data.views) {
-								// are views
-								docStr+="<ul><li>Views:</li>";
-
-								$.each(data.views, function(numeView, objView) {
-									//numeView --- view name
-									// objView.map --- map function
-									//objView.reduce --- reduce function
-									docStr += "<h5>" + numeView + "</h5>";
-									docStr += printComments("map"+ "<br/>", objView.map) + "<br/>";
-									if(typeof objView.reduce !== 'undefined')
-										docStr += printComments("reduce"+ "<br/>", listaFunc.reduce) + "<br/>";	
-								});
-								docStr += "</ul>";
-
-							}
-							docStr += "</li>";	
-							docStr += "<li>";										
-
-
-							if (data.lists) {
-								// are lists
-								docStr+="<ul><li>Lists:</li>";
-
-								$.each(data.lists, function(numeList, sursaList) {
-									//numeList --- list name
-									//sursaList --- list function
-									docStr+= "<h5>"+ numeList+"</h5>";
-									docStr+= printComments(""+"<br/>",sursaList)+"<br/>";
-								});
-								docStr+="</ul>";
-							}
-							docStr+="</li>";
-							docStr += "<li>";
-
-							if (data.shows) {
-								// are shows
-								docStr+="<ul><li>Shows:</li>";
-
-								$.each(data.shows, function(numeShow, sursaShow) {
-									//numeShow --- show name
-									//sursaShow --- show function
-									docStr+="<h5>"+ numeShow +"</h5>";
-									docStr+=printComments(""+"<br/>",sursaShow)+"<br/>";
-								});
-								docStr+="</ul>";
-							}
-							docStr+="</li>";
-							docStr += "<li>";
-
-							if (data.updates) {
-								// are updates
-								docStr+="<ul><li>Updates:</li>";
-
-								$.each(data.updates, function(numeUpdate, sursaUpdate) {
-									//numeUpdate --- update name
-									//sursaUpdate --- update function
-									docStr+="<h5>"+ numeUpdate +"</h5>";
-									docStr+=printComments(""+"<br/>",sursaUpdate)+"<br/>";
-								});
-								docStr+="</ul>";
-
-							}
-							docStr+="</li>";
-							docStr += "<li>";
-
-							if (data.filters) {
-								// are filters
-								docStr+="<ul><li>Filters:</li>";
-
-								$.each(data.filters, function(numeFilter, sursaFilter) {
-									//numeFilter --- filter name
-									//sursafilter --- filter function
-									docStr+="<h5>"+ numeFilter +"</h5>";
-									docStr+=printComments(""+"<br/>",sursaFilter)+"<br/>";
-
-								});
-								docStr+="</ul>";								
-							}
-							docStr+="</li>";
-							docStr += "<li>";
-
-							if (data.fulltext) {
-								// are fulltext - lucene
-								docStr+="<ul><li>Full text:</li>";
-
-								$.each(data.fulltext, function(numeView, sursaIndex) {
-									//numeView --- fulltext name
-									//sursIndex.index --- index function
-									docStr+="<h5>"+ numeView +"</h5>";
-									docStr+=printComments(""+"<br/>",sursaIndex.index)+"<br/>";
-								});
-								docStr+="</ul>";								
-							}
-							docStr+="</li>";
-							docStr += "<li>";
-
-							if (data.validate_doc_update) {
-								// are validate_doc_update
-								docStr+="<ul><li>validate_doc_update:</li>";
-								// name: validate_doc_update
-								// validate_doc_update --- function
-								docStr+=printComments(""+"<br/>",data.validate_doc_update)+"<br/>";
-								docStr+="</ul>";								
-							}
-							docStr+="</li>";	
-
-
-							//save DOCUMENTATION to database
-							$.couch.db(row.db_name).openDoc("DOCUMENTATION", {
-							    success: function(data) {
-							    	//Update exising DOCUMENTATION
-							        console.log(data);
-							        data._attachments = {
-							    			"index.html": {
-										           "content_type": "text/html",
-										           "data":btoa(docStr) 
-										       }
-							    		}
-							        $.couch.db(row.db_name).saveDoc(data, {
-									    success: function(data) {
-									        console.log(data);
-									    },
-									    error: function(status) {
-									        console.log(status);
-									    }
-									});
-
-							    },
-							    error: function(status) {
-							    	//DOCUMENTATION not found, create new one
-							    	var documentation_doc = {
-							    		_id: "DOCUMENTATION",
-							    		_attachments:{
-							    			"index.html": {
-										           "content_type": "text/html",
-										           "data":btoa(docStr) 
-										       }
-							    		}
-							    	};
-							    	$.couch.db(row.db_name).saveDoc(documentation_doc, {
-									    success: function(data) {
-									        console.log(data);
-									    },
-									    error: function(status) {
-									        console.log(status);
-									    }
-									});
-							        console.log(status);
-							    }
-							});				
-							
-						},
-						error: function(status) {
-							//console.log(status);
-							logAppend("<strong style='color: red;'>Error on generating documentation: " + value["id"] + "</strong>&nbsp"+JSON.stringify(status));
+			var docStr ="<html><head><meta charset=\"UTF-8\"></head> <body> Database: " + row.db_name;
+			var data = {};
+			async.series([
+			//get all _design docs
+			function(callback){	
+				$.couch.db(row.db_name).allDesignDocs({
+					success: function(data_docs) {
+						data = data_docs;
+						logAppend("<strong>Design docs found:</strong>&nbsp;"+JSON.stringify(data_docs).replace(/,/g,', '));
+						callback(null,"design docs read");
 						}
-					});
-					
-				});			
-				//console.log(data);
-			}
-		});
+					});	
+				},
+			//get each _design and extract documentation from comments
+			function(callback){
+				$.each(data["rows"], function(key,value) {   
+									
+							$.couch.db(row.db_name).openDoc(value["id"], {
+								success: function(data) {
+									
+									//data.language --- script language, default javascript
+									//value["id"] --- ddoc name
+									
+									docStr += "<h3>Design Doc : "+ value["id"] + "</h3>" ;
+									docStr+= "<h4>"+ "Language: "+ data.language +"</h4>";
+									
+									//console.log(data);
+									if (data.views) {
+										// are views
+										docStr+="<ul><li>Views:</li>";
 
+										$.each(data.views, function(numeView, objView) {
+											//numeView --- view name
+											// objView.map --- map function
+											//objView.reduce --- reduce function
+											docStr += "<h5>" + numeView + "</h5>";
+											docStr += printComments("map"+ "<br/>", objView.map) + "<br/>";
+											if(typeof objView.reduce !== 'undefined')
+												docStr += printComments("reduce"+ "<br/>", objView.reduce) + "<br/>";	
+										});
+										docStr += "</ul>";
+									}
+									
+									if (data.lists) {
+										// are lists
+										docStr+="<ul><li>Lists:</li>";
+
+										$.each(data.lists, function(numeList, sursaList) {
+											//numeList --- list name
+											//sursaList --- list function
+											docStr+= "<h5>"+ numeList+"</h5>";
+											docStr+= printComments(""+"<br/>",sursaList)+"<br/>";
+										});
+										docStr+="</ul>";
+									}
+								
+									if (data.shows) {
+										// are shows
+										docStr+="<ul><li>Shows:</li>";
+
+										$.each(data.shows, function(numeShow, sursaShow) {
+											//numeShow --- show name
+											//sursaShow --- show function
+											docStr+="<h5>"+ numeShow +"</h5>";
+											docStr+=printComments(""+"<br/>",sursaShow)+"<br/>";
+										});
+										docStr+="</ul>";
+									}
+
+									if (data.updates) {
+										// are updates
+										docStr+="<ul><li>Updates:</li>";
+
+										$.each(data.updates, function(numeUpdate, sursaUpdate) {
+											//numeUpdate --- update name
+											//sursaUpdate --- update function
+											docStr+="<h5>"+ numeUpdate +"</h5>";
+											docStr+=printComments(""+"<br/>",sursaUpdate)+"<br/>";
+										});
+										docStr+="</ul>";
+									}
+
+									if (data.filters) {
+										// are filters
+										docStr+="<ul><li>Filters:</li>";
+
+										$.each(data.filters, function(numeFilter, sursaFilter) {
+											//numeFilter --- filter name
+											//sursafilter --- filter function
+											docStr+="<h5>"+ numeFilter +"</h5>";
+											docStr+=printComments(""+"<br/>",sursaFilter)+"<br/>";
+
+										});
+										docStr+="</ul>";								
+									}
+
+									if (data.fulltext) {
+										// are fulltext - lucene
+										docStr+="<ul><li>Full text:</li>";
+
+										$.each(data.fulltext, function(numeView, sursaIndex) {
+											//numeView --- fulltext name
+											//sursIndex.index --- index function
+											docStr+="<h5>"+ numeView +"</h5>";
+											docStr+=printComments(""+"<br/>",sursaIndex.index)+"<br/>";
+										});
+										docStr+="</ul>";								
+									}
+
+									if (data.validate_doc_update) {
+										// are validate_doc_update
+										docStr+="<ul><li>validate_doc_update:</li>";
+										// name: validate_doc_update
+										// validate_doc_update --- function
+										docStr+=printComments(""+"<br/>",data.validate_doc_update)+"<br/>";
+										docStr+="</ul>";									
+									}
+			
+									callback(null,"design doc found");
+								},
+								error: function(status) {
+									//console.log(status);
+									callback(status,"design doc found");
+									logAppend("<strong style='color: red;'>Error on generating documentation: " + value["id"] + "</strong>&nbsp"+JSON.stringify(status));
+								}
+							});
+							
+						});		
+					},		
+			//save documentation	
+			function(callback){
+			//save DOCUMENTATION to database
+			docStr+="</body></html>";
+			$.couch.db(row.db_name).openDoc("DOCUMENTATION", {
+				success: function(data) {
+					//Update exising DOCUMENTATION
+					console.log(data);
+
+					worker = workers_party.getWorker();
+					worker.onmessage = function(e) {
+						logAppend(e.data);
+						//console.log(e.data);
+						workers_party.releaseWorker(worker);
+					};
+					worker.postMessage({'cmd': 'saveDocumentation', 
+										'msg': {database: row.db_name, 
+												ddoc: docStr,
+												rev: data._rev}
+										});
+
+				},
+				error: function(status) {
+					//DOCUMENTATION not found, create new one
+					worker = workers_party.getWorker();
+					worker.onmessage = function(e) {
+						logAppend(e.data);
+						//console.log(e.data);
+						workers_party.releaseWorker(worker);
+					};
+					worker.postMessage({'cmd': 'saveDocumentation', 
+										'msg': {database: row.db_name, 
+												ddoc: docStr,
+												rev: ""}
+										});
+					console.log(status);
+				}
+			});			
+			}],					
+			//callback function error
+			function(err, result){
+				if(err) console.log("Error: " + err);
+				logAppend("Datele au fost salvate cu succes!");
+				}
+			);
+			
 		}
 	}
-	
 	function compactDatabase(){
 		if (row){
 			$.couch.db(row.db_name).compact({

@@ -22,8 +22,8 @@ self.onmessage = function(e) {
 	  //self.postMessage(JSON.parse(CouchDB.request("GET", "/").responseText));
       break;
     case 'saveDocumentation':
-		self.postMessage('<em>WORKER</em> got: ' + data.msg.database + "-" + data.msg.ddoc);
-		var xhr = CouchDB.request("PUT", "/" + data.msg.database + "/DOCUMENTATION/index.html" +
+		self.postMessage('<em>WORKER</em> got saveDocumentation for : ' + data.msg.database);
+		var xhr = CouchDB.request("PUT", "/designeditor/DOCUMENTATION/"+data.msg.database+".html" +
 		((data.msg.rev != "")? "?rev=" + data.msg.rev:""), {
 			headers:{"Content-Type":"text/html;charset=utf-8"},
 			body:data.msg.ddoc

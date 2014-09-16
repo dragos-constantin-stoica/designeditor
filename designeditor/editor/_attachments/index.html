@@ -813,26 +813,42 @@
 	var documentationTemplate = _.template(multilineTemplateString);
 
 
-	function printComments(strFunc) {
-		var myArray = [];
-		var res = strFunc.match(/\/\/(.+)/g);
-		if (res != null) {
-				$.each(res, function(k, comment) {
-				myArray.push(comment+"<br/>");
-			})
-		}
-		res = strFunc.match(/\/\*([\s\S]+)\*\//gm);
-		if (res != null) {
-			myArray.push(" ");
-			$.each(res, function(k, comment) {
-				//myArray.push(encodeURIComponent( escape( comment))+ "<br/>");
-				myArray.push(comment+ "<br/>");
-			})
-			for ( var i = 0; i < myArray.length; i = i + 1 ){
-				console.log(myArray[i]);
-			}
-		}
-	return myArray;
+	function printComments(text) {
+		//detect language
+		var commentBlock = [
+			{language:"javascript", rx:/(\/\*\*\*)(.*\n)+(\*\*\*\/)/g, strip:/(^\/\*\*\*)|(\*\*\*\/$)/g},
+			{language:"erlang", rx:/(\%\%\%)(.*)+\n/g, strip:/\%\%\%/g},
+			{language:"coffeescript", rx:/(###)(.*\n)+(###)/g, strip:/###/g},
+			{language:"python", rx:/(\"\"\")(.*\n)+(\"\"\")/g, strip:/\"\"\"/g}
+		];
+
+		var tags = [
+			{from:/@author: (.*)/g, to:"<strong>$1</strong>"},
+			{from:/@date: (.*)/g, to:"Date: $1"},
+			{from:/@link: (.*)/g, to:"<a href=\"$1\">$1</a>"}
+		];
+		
+		//Get comments from header
+		//Documentation is generated from comments before function declaration
+		var DOC_FOUND = false;
+		DOC_FOUND = commentBlock.some(function(element,index){
+		 	if (element.rx.test(text)){
+		  		text = text.match(element.rx).join('');
+  				//Get rid of comments block
+  				text = text.replace(element.strip,"");
+				//Process tags
+				tags.forEach(function(element,index){
+					text = text.replace(element.from, element.to);
+				});
+
+				//Process text
+				text = text.replace(/\n/g,"<br/>");
+		  		return true;
+		 	}
+		});
+
+		if(!DOC_FOUND) return "<strong>NO DOCUMENTATION FOUND!</strong><br/><h2>PLEASE DOCUMENT THIS CODE!!!</h2>";
+		return text;
 	}
 
 	function generateDocumentation () {

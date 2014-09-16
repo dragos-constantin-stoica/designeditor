@@ -57,7 +57,7 @@ There are a couple of rules that must be respected:
 	  |    |
 	  |    |_[design_document_structure]
 	           |
-	           |_ doc_attributes.js
+	           |_ doc_attributes.json
 	  .
 	  .
 	  .
@@ -97,7 +97,7 @@ There are a couple of rules that must be respected:
 		   |
 		   |_ fulltext	        
 		   |
-	       |_ doc_attributes.js
+	       |_ doc_attributes.json
 	  .
 	  .
 	  .

@@ -38,45 +38,151 @@
       <nav>
         <ul></ul>
       </nav>
-      <section>
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
+      
+      
+ <section>
+<h3>
+<a name="Introduction" class="anchor" href="#Introduction"><span class="octicon octicon-link"></span></a>Introduction</h3>
+<p><b>Description:</b>Couchdb _design documents editor, and some other nice features.</p>
+<p>Note this editor uses parts or full code from:</p>
+	<ul>
+		<li><a href="http://daleharvey.github.io/jquery.couch.js-docs/symbols/$.couch.html">jquery.couch.js</a></li>
+		<li><a href="http://bradley-holt.com/2011/07/couchdb-jquery-plugin-reference/">couch.js</a></li>
+		<li><a href="http://docs.couchdb.org/en/latest/intro/futon.html">Futon CouchDB</a></li>
+		<li><a href="http://www.jeasyui.com/">jquery EasyUI</a></li>
+		<li><a href="http://ace.c9.io/#nav=about">Ace Editor</a></li>
+		<li><a href="http://jsbeautifier.org/">jsbeautifier</a></li>
+		<li><a href="http://stuk.github.io/jszip/">JSZip</a></li>
+		<li><a href="http://underscorejs.org/">underscore.js</a></li>
+	</ul>
+<b>About:</b>
+<p>This application was build to leverage the basic code editor that is built in CouchDB. We started using 
+CouchDB in 2012 and we faced an inflation of _design docs with associated views, list, shows etc and the 
+actual tool was no more answering to our needs so we build a tool that is simple, included in CouchDB and allows 
+to manage _design docs globally.</p>
+<!--
 <pre><code>$ cd your_repo_root/repo_name
 $ git fetch origin
 $ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+</code></pre>-->
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<a name="how-to-install" class="anchor" href="#how-to-install"><span class="octicon octicon-link"></span></a>How to install?</h3>
+<ol>
+	<li>Install Appzip<a href=" https://github.com/dragos-constantin-stoica/designeditor/tree/appzip">  https://github.com/dragos-constantin-stoica/designeditor/tree/appzip</a></li>
+	<li>Clone this repository (git clone <a href="git://github.com/dragos-constantin-stoica/designeditor.git"> git://github.com/dragos-constantin-stoica/designeditor.git</a>)</li>
+	<li>Publish design.zip with Appzip</li>
+	<li>Open your favorite web browser and go to: <br/><code> http://localhost:5984/designeditor/_design/editor/index.html</code> </li>
+	<li>Enjoy!</li>
+</ol>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="how-to-use-it" class="anchor" href="#rhow-to-use-it"><span class="octicon octicon-link"></span></a>How to use it?</h3>
+<p>The application has 3 main tabs:</p>
+<ul>
+	<li>Databases</li>
+	<li>Design Document Editor</li>
+	<li>Application Log</li>
+</ul>
+<p>There is a clickable icon on the right most side with a menu:</p>	
+<ul>
+	<li>Server Log: opens in new tab CouchDb server log. You have a refresh button on the tab to reload the server log,</li>
+	<li>Server Status: opens in new tab the list of active tasks on the CouchDB server,</li>
+	<li>Application Log</li>
+	<li>Snippets: opens in new tab snippets that can be run from the browser. CAUTION! The execution is synchronous and may block the browser if the script takes too long to complete, and</li>
+	<li>AppZip integration: you can publish couchapps in zip format with this tool</li>
+	<li>About.</li>
+</ul>
+<p>After susccessfully loading the applcation, you will see the list of databases loaded intro the database grid.
+ You have a contextual menu for each database row. You have a global database menu:</p>
+ <ul>
+	<li>New Database: creates a new empty database</li>
+	<li>Replicator: does the replication. You can replicate only some documentes or/and use filters with parameters</li>
+	<li>Refresh: reload all local databases intro the database grid</li>
+</ul>
+ 
+<h3>
+<a name="the-context-menu-for-database" class="anchor" href="#the-context-menu-for-database"><span class="octicon octicon-link"></span></a>The context menu for database</h3>
+<ul>
+	<li>Design Documents: loads all design documents (_design/) into the Design Documents tab</li>
+	<li>Compact Database: compacts the database. <b>CAUTION!</b> All versions of the documents will be deleted but last -- the only to be kept will be kept. Do not perform this operation on production environments.</li>
+	<li>Cleaup Views: clean up old index files. Useful for housekeeping of disk space</li>
+	<li>Rebuild All Index: run by workers, will rebuild for each view the index files. According to the number of view in the database, this operation may take time. The messages from workers will be visible in Application Log and you may check the indexer status in Server Status.</li>
+	<li>Open Document: open a document with a given doc._id. The document content is displayed in new tab as javascript and can be directly edited</li>	
+	<li>New Document: creates a new document with specified ID or new UUID if no ID is specified. The you can edit the document.</li>
+	<li>Delete Database: deletes selected database. <b>CAUTION!</b> This operation is irreversible!</li>
+</ul>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
+<h3>
+<a name="the-content-of-design-documents-editor" class="anchor" href="#the-content-of-design-documents-editor"><span class="octicon octicon-link"></span></a>The content of Design Documents Editor</h3>
+<p>On the left side you have a collapsible panel with a tree grid contanting the list of all design documents from
+selected database. The following document types are recognized: <b>views</b> (map and reduce functions), <b>lists</b>, 
+<b>shows</b>, <b>updates</b>, <b>filters</b>,<b> validate_doc_update</b>, and <b>fulltext</b> (index functions - used by Lucene).
+ On the center - main area, you have a code editing zone. Each function (the code) is displayed in a new tab. 
+ Only for wiews you may rebuild the index from the context menu of the tree grid.</p>
+ <p>The tree grid is strucured as follows:</p>
+ <!-- Aici pot face chiar un tree -->
+ <ul><li>database (root)</li>
+	<ul><li>design documents (by name)</li>
+		<ul>
+			<li>validate doc update (function)</li>
+			<li>lists</li>
+			<li>views</li>
+			<li>updates</li>
+			<li>shows</li>
+			<li>filters</li>
+			<li>fulltext</li>
+				<ul><li>functions (by name) with markers M: map, R: reduce, IDX: index</li></ul>	
+		
+		</ul>
+	</ul>
+ </ul>   
+ <p>The tree grid has a main menu: <i>Refresh</i>, <i>Collapse All</i>, <i>Expand All</i>, <i>Collapse level 1 </i>(at design documents level) and <i>Expand level 1</i></p>  
+ <p>The context menu for design documents grid:</p>
+ 
+<b>Level 0:</b> database -- create new design document<br/>
+<b>Level 1:</b> design document -- rename, duplicate, delete design document; change programming language; add new design document element (view, list, show, update, filter, fulltext, validate doc update)<br/>
+<b>Level 2:</b> design document element -- new function element, delete function element, rebuild index and compact view available only for views. Validate doc update is a single function per design document so it is stored here and has the contextual menu of a function (see Level 3).<br/>
+<b>Level 3:</b> function level -- rename, duplicate and delete function. For code editing just click on the leaf.<br/>
+    
+<h3>
+<a name="replicator" class="anchor" href="#replicator"><span class="octicon octicon-link"></span></a>Replicator</h3>    
+<p>The replication mechanism is similar with Futon and extended with design document ids to replicate and filters with parameters.</p>   
+<ul>
+		<li>	<p>Basic replication:</p> </li>
+			   <blockquote><p>
+			   Introduce database names for source and destination.Check if you want to create the destination database and if you want continuous replication.
+			   </p></blockquote>
+		<li>	<p>Replication of selected documents only:</p></li>
+			   <blockquote><p>
+				Same as basic and you should check <i>"Only selected documents"</i>. For local source database you may select the design documents, and you can introduce as a list of coma "," separated values the <b>doc._id</b> of documents you wanto to replicate.
+			   </p></blockquote>   
+		<li>	<p>Filtered replication</p></li>
+			   <blockquote><p>
+				Same as basic replication and you should check "Replicate with Filter". For local source database you may select the filter. Optionaly you may complete query parameters in JSON format e.g. {"key":"value"}.
+			   </p></blockquote>   
+</ul>   
+
+<!-- Optional --> 
+<h3>
+<a name="to-do" class="anchor" href="#to-do"><span class="octicon octicon-link"></span></a>TO DO</h3>  
+ <ol>
+	 <li>implement security management (authentication, user and rights management)</li>
+	 <li>support for file attachement management</li>
+	 <li>display a list with all documents from a database</li>
+	 <li>display results for views, lists, shows</li>
+	 <li>build a tool to generate documentation from comments</li>
+	 <li>cancel replication (continuous) function</li>
+</ol>	  
+<p>That's all for the moment. Please fork the code and help to complete this tool.</p>
+<p>Thank you!</p>
+<p>Happy CouchDB codding!</p>
+  </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/dragos-constantin-stoica">dragos-constantin-stoica</a></p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
   </body>
 </html>

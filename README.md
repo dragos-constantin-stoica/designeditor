@@ -1,3 +1,10 @@
+REPOSITORY TRANSFERED TO: https://github.com/iqcouch/designeditor
+=================================================================
+
+PLEASE FOLLOW UPDATES THERE!!!
+==============================
+
+
 designeditor
 ============
 

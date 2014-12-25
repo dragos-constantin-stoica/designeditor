@@ -154,6 +154,7 @@
 								if (doc_attributes){
 									couch_doc = JSON.parse(base64[child+"doc_attributes.json"]);
 									//other attibutes may have the value in [attribute_name].js file
+									//or directly declared in JSON structure of doc_attributes.json file
 								};
 												
 								//get all files from this subdirecotry					
@@ -173,17 +174,17 @@
 								});				
 												
 								//search for attachements, 
-								//for design documents searc for views->[view_name]->map|reduce, lists, shows, updates, validate_doc_update.js, filters, 
+								//for design documents search for views->[view_name]->map|reduce, lists, shows, updates, validate_doc_update.js, filters, 
 								//fulltext (lucene index) 
 					
 								//validate_doc_update
 								if(_.has(base64,child+"validate_doc_update.js")){
-									couch_doc.validate_doc_update = base64[child+"validate_doc_update.js"];
+									couch_doc["validate_doc_update"] = base64[child+"validate_doc_update.js"];
 								}
 					
 								//rewrites
 								if(_.has(base64,child+"rewrites.js")){
-									couch_doc.rewrites = base64[child+"rewrites.js"];
+									couch_doc["rewrites"] = base64[child+"rewrites.js"];
 								}
 					
 								//search for subdirectories of the document
@@ -326,7 +327,8 @@
 											}
 										});
 									}
-								});			
+								});
+
 							},db);
 						}
 					}

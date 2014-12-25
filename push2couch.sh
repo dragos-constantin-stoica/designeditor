@@ -6,17 +6,19 @@
 # appzip
 
 
+COUCHDB_CONNECTION="http://loreal:loreal@192.168.1.2:5984"
+
 #
 # Cleanup first
 # Delete database
 #
 
-curl -X DELETE http://127.0.0.1:5984/appzip
-curl -X PUT http://127.0.0.1:5984/appzip
-curl -X PUT http://127.0.0.1:5984/appzip/_design/appzip -d {}
+curl -X DELETE $COUCHDB_CONNECTION/appzip
+curl -X PUT $COUCHDB_CONNECTION/appzip
+curl -X PUT $COUCHDB_CONNECTION/appzip/_design/appzip -d {}
 
 for file in *; do
-    rev="$(curl -sS http://127.0.0.1:5984/appzip/_design/appzip | sed -ne 's/^.*"_rev":"\([^"]*\)".*$/\1/p')"
+    rev="$(curl -sS $COUCHDB_CONNECTION/appzip/_design/appzip | sed -ne 's/^.*"_rev":"\([^"]*\)".*$/\1/p')"
 	#echo $rev 
 	
 	contenttype="Content-Type: application/octet-stream"
@@ -49,5 +51,5 @@ for file in *; do
 	esac
 	
 	
-	curl -vX PUT http://127.0.0.1:5984/appzip/_design/appzip/$file?rev="$rev" --data-binary @"$file" -H "$contenttype"
+	curl -vX PUT $COUCHDB_CONNECTION/appzip/_design/appzip/$file?rev="$rev" --data-binary @"$file" -H "$contenttype"
 done

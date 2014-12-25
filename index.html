@@ -154,7 +154,6 @@
 								if (doc_attributes){
 									couch_doc = JSON.parse(base64[child+"doc_attributes.json"]);
 									//other attibutes may have the value in [attribute_name].js file
-									//or directly declared in JSON structure of doc_attributes.json file
 								};
 												
 								//get all files from this subdirecotry					
@@ -174,17 +173,17 @@
 								});				
 												
 								//search for attachements, 
-								//for design documents search for views->[view_name]->map|reduce, lists, shows, updates, validate_doc_update.js, filters, 
+								//for design documents searc for views->[view_name]->map|reduce, lists, shows, updates, validate_doc_update.js, filters, 
 								//fulltext (lucene index) 
 					
 								//validate_doc_update
 								if(_.has(base64,child+"validate_doc_update.js")){
-									couch_doc["validate_doc_update"] = base64[child+"validate_doc_update.js"];
+									couch_doc.validate_doc_update = base64[child+"validate_doc_update.js"];
 								}
 					
 								//rewrites
 								if(_.has(base64,child+"rewrites.js")){
-									couch_doc["rewrites"] = base64[child+"rewrites.js"];
+									couch_doc.rewrites = base64[child+"rewrites.js"];
 								}
 					
 								//search for subdirectories of the document
@@ -197,7 +196,7 @@
 										couch_doc["lists"] = {};
 										//get all files from this subdirectory
 										_.each(base64, function(value, key){
-											if(key.indexOf(subdirectory+"lists/") == 0){
+											if(key.indexOf(subdirectory) == 0){
 												var list_name = key.split("/").pop();
 												list_name = list_name.split(".")[0];
 												couch_doc["lists"][list_name] = value;
@@ -211,7 +210,7 @@
 										couch_doc["shows"] = {};
 										//get all files from this subdirectory
 										_.each(base64, function(value, key){
-											if(key.indexOf(subdirectory+"shows/") == 0){
+											if(key.indexOf(subdirectory) == 0){
 												var list_name = key.split("/").pop();
 												list_name = list_name.split(".")[0];
 												couch_doc["shows"][list_name] = value;
@@ -226,7 +225,7 @@
 										couch_doc["updates"] = {};
 										//get all files from this subdirectory
 										_.each(base64, function(value, key){
-											if(key.indexOf(subdirectory+"updates/") == 0){
+											if(key.indexOf(subdirectory) == 0){
 												var list_name = key.split("/").pop();
 												list_name = list_name.split(".")[0];
 												couch_doc["updates"][list_name] = value;
@@ -241,7 +240,7 @@
 										couch_doc["filters"] = {};
 										//get all files from this subdirectory
 										_.each(base64, function(value, key){
-											if(key.indexOf(subdirectory+"filters/") == 0){
+											if(key.indexOf(subdirectory) == 0){
 												var list_name = key.split("/").pop();
 												list_name = list_name.split(".")[0];
 												couch_doc["filters"][list_name] = value;
@@ -255,7 +254,7 @@
 										couch_doc["fulltext"] = {};
 										//get all files from this subdirectory
 										_.each(base64, function(value, key){
-											if(key.indexOf(subdirectory+"fulltext/") == 0){
+											if(key.indexOf(subdirectory) == 0){
 												var list_name = key.split("/").pop();
 												list_name = list_name.split(".")[0];
 												couch_doc["fulltext"][list_name] = {"index": value};
@@ -327,8 +326,7 @@
 											}
 										});
 									}
-								});
-
+								});			
 							},db);
 						}
 					}

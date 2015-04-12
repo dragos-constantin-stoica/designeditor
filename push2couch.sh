@@ -6,7 +6,7 @@
 # appzip
 
 
-COUCHDB_CONNECTION="http://loreal:loreal@192.168.1.2:5984"
+COUCHDB_CONNECTION="http://user:password@192.168.1.2:5984"
 
 #
 # Cleanup first

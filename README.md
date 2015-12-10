@@ -53,15 +53,13 @@ There are a couple of rules that must be respected:
 	<pre>
 	[database_name]
 	  |
+	  |_ manifest.json
 	  |_ [document_name]
 	  |    |
 	  |    |_[design_document_structure]
-	           |
-	           |_ doc_attributes.json
+	  .        |
+	  .        |_ doc_attributes.json
 	  .
-	  .
-	  .
-	  manifest.json
 	</pre>
 
 
@@ -74,6 +72,7 @@ There are a couple of rules that must be respected:
 	  |    |
 	  |    |_[design_document_structure]
 	  .    |
+	  .    |_ doc_attributes.json
 	  .    |
 		   |_ _attachements
 		   |
@@ -96,8 +95,6 @@ There are a couple of rules that must be respected:
 		   |_ validate_doc_update
 		   |
 		   |_ fulltext	        
-		   |
-	       |_ doc_attributes.json
 	  .
 	  .
 	  .

@@ -54,6 +54,7 @@ There are a couple of rules that must be respected:
 	[database_name]
 	  |
 	  |_ manifest.json
+	  |
 	  |_ [document_name]
 	  |    |
 	  |    |_[design_document_structure]
@@ -70,8 +71,6 @@ There are a couple of rules that must be respected:
 	  |
 	  |_ [document_name]
 	  |    |
-	  |    |_[design_document_structure]
-	  .    |
 	  .    |_ doc_attributes.json
 	  .    |
 		   |_ _attachements
@@ -80,7 +79,9 @@ There are a couple of rules that must be respected:
 		   |    |_[view_name]
 		   |    |   |_ map.js
 		   |	|   |_ reduce
-		   |    ...
+		   |    .
+		   |    .
+		   |    .
 		   |
 		   |_ lists
 		   |

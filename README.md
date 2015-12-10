@@ -1,10 +1,3 @@
-REPOSITORY TRANSFERED TO: https://github.com/iqcouch/designeditor
-=================================================================
-
-PLEASE FOLLOW UPDATES THERE!!!
-==============================
-
-
 designeditor
 ============
 
@@ -141,10 +134,10 @@ TODO
 ====
 
 1. implement security management (authentication, user and rights management)
-2. support for file attachement management
+2. support for file attachment management
 3. display a list with all documents from a database
 4. display results for views, lists, shows
-5. build a tool to generate documentation from comments
+5. IDE for couchapps - create and modify atteched web application files
 6. cancel replication (continuous) function
 
 That's all for the moment.

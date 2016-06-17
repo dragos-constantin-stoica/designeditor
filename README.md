@@ -57,23 +57,23 @@ There are a couple of rules that must be respected:
 	  |_ [database_name]
 	  	|
 	  	|_ [document_name]
-	  	|    |
-	  	|    |_[design_document_structure]
-	  	.        |
-	  	.        |_ doc_attributes.json
+	  	|	|
+	  	|	|_ doc_attributes.json
+	  	|	|
+	  	|	|_[design_document_structure]        
+	  	.        
 	  	.
 	```
 
-	Design document folder and file structure structure
+	Design document folder contains `doc_attributes.json` file, folders corresponding to special CoucDB document fields and subforlders structure structure containing source code files:
 	
-	<pre>
+	```
 	[database_name]
 	  |
 	  |_ [document_name]
 	  	|_ doc_attributes.json	
 	  	|
 		|_ _attachements
-		|	
 		|_ views
 		|	|_[view_name]
 		|		|_ map.js
@@ -82,14 +82,27 @@ There are a couple of rules that must be respected:
 		|_ shows
 		|_ updates
 		|_ filters
-		|_  rewrites
-		|_ validate_doc_update
+		|_ rewrites
+		|_ validate_doc_update.js
 		|_ fulltext	        
 	  .
 	  .
 	  .
 
-	</pre>
+	```
+	Special fields that are translated into folderls are:
+	
+	* `_attachments`  - all subfolders and files are attached to the document as they are stored on local drive
+	* `views` - they contain a subfolder structure representing the views, the name of the subforder is the name of the view. Inside each subfolder there is manadatory file `map.js` containing the map functiona and an optional `reduce.js` containing the reduce function source code. If you are using another programming language for your view you may use `map.erl` for Erlang written map function.
+	* `lists` - each list function source code is containen in `[list_function_name].js` file
+	* `shows` - each show function source code is containen in `[show_function_name].js` file
+	* `updates` - each update function source code is containen in `[update_function_name].js` file
+	* `filters` - each filter function source code is containen in `[filter_function_name].js` file
+	* `rewrites`
+	* `validate_doc_update.js` - a single JavaScript file that contains an update 
+	* `fulltext` - Lucene index specific.
+	
+	One may use the `doc_attributes.json` file to define entire documents with `_id` and all attributes/fileds.
 	
 	doc_attributes.json file structure
 

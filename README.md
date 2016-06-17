@@ -1,9 +1,8 @@
 Appzip
 ======
 
-Couchdb application installer
-
-Appzip allows you to publish (load) into CouchDB applicaitons (couchapps) from a zip file.
+CouchDB application deployment/installer.  
+Appzip allows you to publish (load) into CouchDB applicaitons (couchapps) as zip file.
 
 
 How to install
@@ -12,7 +11,7 @@ How to install
 * Download files or just app.zip (unzip it after download).
 * In a terminal, automatic install:
 
-<code>./push2couch.sh</code>
+`./push2couch.sh`
 
 Or install manually:
 
@@ -38,11 +37,11 @@ Structure of zip file
 There are a couple of rules that must be respected:
 
 1. In the root of your zip a file named *manifest.json* must be present. The structure of the file is:
-  <pre>
+  ```json
   {
 	  "database":["database_name"]
   }
-  </pre>
+  ```
   
   The **database** attibute contains a list of strings with database names
 
@@ -50,19 +49,20 @@ There are a couple of rules that must be respected:
 
 	Directory and file structure:
 
-	<pre>
-	[database_name]
+	```
+	[project_folder]
 	  |
 	  |_ manifest.json
 	  |
-	  |_ [document_name]
-	  |    |
-	  |    |_[design_document_structure]
-	  .        |
-	  .        |_ doc_attributes.json
-	  .
-	</pre>
-
+	  |_ [database_name]
+	  	|
+	  	|_ [document_name]
+	  	|    |
+	  	|    |_[design_document_structure]
+	  	.        |
+	  	.        |_ doc_attributes.json
+	  	.
+	```
 
 	Design document folder and file structure structure
 	
@@ -70,32 +70,21 @@ There are a couple of rules that must be respected:
 	[database_name]
 	  |
 	  |_ [document_name]
-	  |    |
-	  .    |_ doc_attributes.json
-	  .    |
-		   |_ _attachements
-		   |
-		   |_ views
-		   |    |_[view_name]
-		   |    |   |_ map.js
-		   |	|   |_ reduce
-		   |    .
-		   |    .
-		   |    .
-		   |
-		   |_ lists
-		   |
-		   |_ shows
-		   |
-		   |_ updates
-		   |
-		   |_ filters
-		   |
-		   |_  rewrites
-		   |
-		   |_ validate_doc_update
-		   |
-		   |_ fulltext	        
+	  	|_ doc_attributes.json	
+	  	|
+		|_ _attachements
+		|	
+		|_ views
+		|	|_[view_name]
+		|		|_ map.js
+		|		|_ reduce
+		|_ lists
+		|_ shows
+		|_ updates
+		|_ filters
+		|_  rewrites
+		|_ validate_doc_update
+		|_ fulltext	        
 	  .
 	  .
 	  .
@@ -106,15 +95,14 @@ There are a couple of rules that must be respected:
 
 	A JSON containing all atributes of the document. If no _id is provided then a new "data" document is created using a CouchDB generated id. In order to create a design_doc use "_id": "_design/[design_document_name]. Defult language is javascript if not provided.
 	
-	
-	
-	<pre>
+
+	```json
 	{
 	 "_id":"[design_document_name | document_id]",
 	 "language":"javascript",
 	 ["attribute"]:[value]
 	}
-	</pre>
+	```
 
 3. Zip all these files and push them to CouchDB and you will have your application
 

@@ -7,8 +7,8 @@
 #
 
 # Change your connection string accordingly
-# COUCHDB_CONNECTION="http://admin:password@localhost:5984”
-COUCHDB_CONNECTION="http://localhost:5984”
+# COUCHDB_CONNECTION="http://admin:password@localhost:5984"
+COUCHDB_CONNECTION="http://localhost:5984"
 
 #
 # Cleanup first
@@ -21,12 +21,12 @@ curl -X PUT $COUCHDB_CONNECTION/appzip/_design/appzip -d {}
 
 for file in *; do
     rev="$(curl -sS $COUCHDB_CONNECTION/appzip/_design/appzip | sed -ne 's/^.*"_rev":"\([^"]*\)".*$/\1/p')"
-	#echo $rev 
-	
+	#echo $rev
+
 	contenttype="Content-Type: application/octet-stream"
-	
+
 	case "$file" in
-	*.txt | *.map) 
+	*.txt | *.map)
 			contenttype="Content-Type: text/plain"
 	        ;;
 	*.js)
@@ -46,12 +46,12 @@ for file in *; do
 			;;
 	*.png)
 			contenttype="Content-Type: image/png"
-			;;			
+			;;
 	*)
 			contenttype="Content-Type: application/octet-stream"
 	        ;;
 	esac
-	
-	
+
+
 	curl -vX PUT $COUCHDB_CONNECTION/appzip/_design/appzip/$file?rev="$rev" --data-binary @"$file" -H "$contenttype"
 done

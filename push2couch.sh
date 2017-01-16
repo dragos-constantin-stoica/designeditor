@@ -4,9 +4,11 @@
 # Push to CouchDB all files in this directory
 # as attachetemts to _design/appzip in database
 # appzip
+#
 
-
-COUCHDB_CONNECTION="http://loreal:loreal@192.168.1.2:5984"
+# Change your connection string accordingly
+# COUCHDB_CONNECTION="http://admin:password@localhost:5984”
+COUCHDB_CONNECTION="http://localhost:5984”
 
 #
 # Cleanup first

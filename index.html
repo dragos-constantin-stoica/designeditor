@@ -22,11 +22,16 @@
 	<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
     -->
 
-	<script src="/_utils/script/json2.js"></script>
-	<script src="/_utils/script/sha1.js"></script>
-	<script src="/_utils/script/base64.js"></script>
-	<script src="/_utils/script/jquery.js"></script>
-	<script src="/_utils/script/jquery.couch.js"></script> 
+	<!--
+		Get old JavaScript files from CouchDB 1.6.1 so that we can run this app
+		on CouchDB 2.0.0 until another framework is built ... by us :P
+	-->
+	<script type="text/javascript" src="json2.js"></script>
+	<script type="text/javascript" src="sha1.js"></script>
+	<script type="text/javascript" src="base64.js"></script>
+	<!-- Solve the conflict with mainstream JQuery, this is a custom version build by CouchDB team -->
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery.couch.js"></script> 
 	
 	<script type="text/javascript" src="jszip.js"></script>
 	<script type="text/javascript" src="jszip-utils.js"></script>
@@ -43,9 +48,7 @@
 </head>
 <body>
 	<div class="container">
-		<div class="row">
-        
-        
+		<div class="row">       
 			<div class="col-md-9">
 				<h1>CouchDB Application Manager</h1>
 				<!-- ===================== -->

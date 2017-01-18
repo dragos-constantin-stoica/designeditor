@@ -10,9 +10,9 @@
  * @author Dragos STOICA
  * @date 05.03.2014
  */ 
-importScripts('/_utils/script/couch.js',
-              '/_utils/script/json2.js',
-              '/_utils/script/sha1.js');
+importScripts('couchdb/couch.js',
+              'couchdb/json2.js',
+              'couchdb/sha1.js');
               
 self.onmessage = function(e) {
   var data = e.data;

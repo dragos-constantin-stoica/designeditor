@@ -10,6 +10,7 @@
 # COUCHDB_CONNECTION="http://admin:password@localhost:5984"
 COUCHDB_CONNECTION="http://localhost:5984"
 
+
 #
 # Cleanup first
 # Delete database

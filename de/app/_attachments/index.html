@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>CouchDB _design doc editor</title>
+    <meta name="viewport" content="initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+    <!--library files-->
+    <link rel="stylesheet" href="http://cdn.webix.com/edge/webix.css" type="text/css">
+    <script src="http://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
+    <!-- CouchDB Webix library -->
+    <script src="webix.couchdb.js" type="text/javascript"></script>
+    <!-- Support libraries -->
+    <script src="lib/mime-types.js" type="text/javascript"></script>
+
+    <!--application files-->
+    <script src="infrastructure.js" type="text/javascript"></script>
+    <script src="db.js" type="text/javascript"></script>
+    <script src="app.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+    <script type="text/javascript" charset="utf-8">
+      //TODO - test variable - delete before release
+        var serverCDB = new webix.CouchDB();
+
+        webix.ready(function() {
+            designeditor.init(); //reference to logic section
+        });
+    </script>
+</body>
+</html>
